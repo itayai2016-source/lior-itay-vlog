@@ -45,7 +45,7 @@ def newmask(size):
 
 # ---------- character ----------
 LW, LH = 300, 520          # layer size (1x)
-FEET = (150, 500); CENTER_Y = 280
+FEET = (150, 500); CENTER_Y = LH // 2   # rotate() turns the layer about its midpoint
 PROFILE = {
     "L": dict(skin=(232,186,150), shirt=(235,120,45), pants=(55,70,105), shoes=(240,240,240), hair=(55,32,18), iris=(90,55,25)),
     "I": dict(skin=(226,178,145), shirt=(40,110,200), pants=(40,40,48), shoes=(30,30,30), hair=(30,22,18), iris=(70,50,30)),
@@ -728,13 +728,21 @@ def render_scene(name, fn, dur):
     n = int(round(dur*FPS)); tmp = f"{OUT}/{name}.tmp.mp4"
     p = subprocess.Popen(["ffmpeg","-y","-loglevel","error","-f","rawvideo","-pix_fmt","rgb24","-s",f"{W}x{H}","-r",str(FPS),"-i","-",
                           "-c:v","libx264","-crf","18","-preset","veryfast","-pix_fmt","yuv420p", tmp], stdin=subprocess.PIPE)
-    for f in range(n): p.stdin.write(render_frame(fn, f).tobytes())
-    p.stdin.close()
+    try:
+        for f in range(n): p.stdin.write(render_frame(fn, f).tobytes())
+    except BaseException:
+        p.kill(); p.wait()
+        if os.path.exists(tmp): os.remove(tmp)
+        raise
+    finally:
+        if not p.stdin.closed: p.stdin.close()
     if p.wait() == 0: os.replace(tmp, f"{OUT}/{name}.mp4")
-    else: sys.exit("ffmpeg failed " + name)
+    else: raise RuntimeError(f"ffmpeg failed while encoding scene {name!r}")
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
+    if len(sys.argv) < 2 or sys.argv[1] not in ("preview", "render"):
+        sys.exit(f"usage: python3 {sys.argv[0]} preview|render [scene ...]")
     if sys.argv[1] == "preview":
         for name, fn, dur in SCENES:
             if len(sys.argv) > 2 and name not in sys.argv[2:]: continue

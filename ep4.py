@@ -726,8 +726,7 @@ def s_credits(f):
     place(img, character("I", "grin", arm_l=40, arm_r=wv), 1150, 660 - abs(math.sin(t*5+1))*8, scale=0.55, ground_y=660)
     if t > 18.0:
         k = ease_out_back((t-18.0)/0.5)
-        d = ImageDraw.Draw(img, "RGBA")
-        d.rectangle([0, 0, W*S, H*S], fill=(0,0,0,int(150*clamp((t-18)/0.6))))
+        img.alpha_composite(Image.new("RGBA", img.size, (0,0,0,int(150*clamp((t-18)/0.6)))))
         text(img, "עונה 2 בקרוב...", W/2, 300, 76*k, fill=GOLD, sw=6, stroke=(70,30,0))
         pulse = 1 + 0.05*math.sin(t*8)
         bw, bh = 220*k*pulse, 42*k*pulse
@@ -745,6 +744,8 @@ SCENES = [("s01_open", s_open, 16.0), ("s03_host", s_host, 14.0), ("s04_spoon", 
 
 if __name__ == "__main__":
     os.makedirs("ep4", exist_ok=True)
+    if len(sys.argv) < 2 or sys.argv[1] not in ("preview", "render"):
+        sys.exit(f"usage: python3 {sys.argv[0]} preview|render [scene ...]")
     if sys.argv[1] == "preview":
         want = sys.argv[2:]
         pts = {"s01_open": [1.5, 6.0, 12.0], "s03_host": [2.0, 5.5], "s04_spoon": [1.0, 10.0, 12.0, 13.0],

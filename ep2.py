@@ -343,6 +343,8 @@ SCENES = [("intro", sc_intro, 5.0), ("bottle", sc_bottle, 8.5), ("basket", sc_ba
 
 if __name__ == "__main__":
     os.makedirs("ep2", exist_ok=True)
+    if len(sys.argv) < 2 or sys.argv[1] not in ("preview", "render"):
+        sys.exit(f"usage: python3 {sys.argv[0]} preview|render [scene ...]")
     if sys.argv[1] == "preview":
         pts = {"intro": [3.0], "bottle": [2.7, 6.3, 7.5], "basket": [2.6, 3.6, 6.2], "stare": [4.0, 6.6, 7.3, 8.3],
                "blooper": [2.4, 3.3], "outro": [4.0]}

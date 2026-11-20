@@ -1,4 +1,4 @@
-import numpy as np, wave
+import os, numpy as np, wave
 SR = 44100
 DUR = 293.0
 N = int(SR*DUR)
@@ -228,6 +228,7 @@ out = np.tanh((music*0.75 + sfx)*0.9)*0.9
 fo = int(1.0*SR); out[-fo:] *= np.linspace(1, 0, fo)
 pcm = (out*32767).astype(np.int16)
 st = np.repeat(pcm[:, None], 2, axis=1)
+os.makedirs("ep4", exist_ok=True)
 with wave.open("ep4/audio.wav", "wb") as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes(st.tobytes())
 print("ok", len(out)/SR)

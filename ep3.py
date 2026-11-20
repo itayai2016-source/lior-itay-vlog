@@ -309,6 +309,8 @@ SCENES = [("intro", sc_intro, 5.0), ("book", sc_book, 8.5), ("plane", sc_plane, 
 
 if __name__ == "__main__":
     os.makedirs("ep3", exist_ok=True)
+    if len(sys.argv) < 2 or sys.argv[1] not in ("preview", "render"):
+        sys.exit(f"usage: python3 {sys.argv[0]} preview|render [scene ...]")
     if sys.argv[1] == "preview":
         pts = {"intro": [3.0], "book": [3.2, 4.3, 7.0], "plane": [2.6, 4.7, 5.1, 6.5], "pouf": [3.0, 4.8, 6.5],
                "blooper": [2.3, 4.0], "outro": [4.0]}
